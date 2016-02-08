@@ -1,0 +1,80 @@
+==================================================================
+https://keybase.io/unfo
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of http://jw.fi
+  * I am unfo (https://keybase.io/unfo) on keybase.
+  * I have a public key with fingerprint 1485 CCD5 91B1 AFDE 6600  6470 9989 5A38 C6F4 E0DE
+
+To do so, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "eldest_kid": "01013f01163a658da24299b51572476de54db0d046475403f873836b7d7d77eded4c0a",
+            "fingerprint": "1485ccd591b1afde6600647099895a38c6f4e0de",
+            "host": "keybase.io",
+            "key_id": "99895a38c6f4e0de",
+            "kid": "01013f01163a658da24299b51572476de54db0d046475403f873836b7d7d77eded4c0a",
+            "uid": "1afe101730a81f9e4fcc68d19d469d00",
+            "username": "unfo"
+        },
+        "revoke": {
+            "sig_ids": [
+                "571cd9c997115c383b2d07662641d74e3cec2f21da7558d2c006590f2397fd180f"
+            ]
+        },
+        "service": {
+            "hostname": "jw.fi",
+            "protocol": "http:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1454948203,
+    "expire_in": 157680000,
+    "prev": "2792e630c61cb92ee94017f19260aafc8fd32329b99cf6967e2abf6240be8312",
+    "seqno": 6,
+    "tag": "signature"
+}
+
+which yields the signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: Keybase OpenPGP v2.0.49
+Comment: https://keybase.io/crypto
+
+yMN+AnicrZJrUFRlGMe5COKGXEJtvGTNGcxYlvXcL0sODYokZMIUUKIs55z3PcsJ
+2rPsTViuAWGpE6STTg4XLzm54aAoU5sNEJXxAR0YoFIbNUQyREwcYwrSepexb33s
+PR/e9zzzf37P//zP++3i4ABd4JFh6VHt4E1PYH/vLVdAtq+nsAyTNFCKmcqwQji/
+wSIAHU5zoQowE4YTOEEpOEGwlMgyPBBJmhQEiSEYjqQ5FkCGBhIOcJqlOYbGKYXn
+KJ5iJQ6gh4MAAlrGRcyAKarVAu02u2p1IixB84wsA0YgJEJUAGRZHEcEXBB4gREp
+XmYVGuIAosYCzeHvQOYk0QGNqoZq6MU8b+8/9P+zb9c8DpmEiMhRuMgTigBpRZZZ
+HhACoFkB4Lhf6IB2q/gWRGqXVdGwCgNmh26tEPozdagWZNiBmXIxhiNkIMiCwBEE
+I6OhEglwjmVJliYAR0NKhjKpkAQQOQYZJ2WUDCPgCkkJnAIIHlewHYiNprlVeR7u
+T+jx5Dd3GhUVmbHZNacma0WoVOB02kx+N85Sm1+yE0rmx81mSbUC9F9QgxvaHapm
+xUwEUspO1U8jaIYWaJ7EKQMGS2yqHZpVv4LhWB5Hyz8GuhGS5AQSshQus4QsoSMU
+aJSVQggki4uiIvMKoEiKFCRBkBVWYDlIipLCkjQuQZ4iSMz/OcVWDTOxyKZoQUgU
+mFV0uuwQq/i6d/uCgEBdQGhIkP++BugWRf17i4cSI+dCbfs3xHSFP2idXbNgadze
+e92nX+7Qn/qjyd0+k9rh3Ra9Xb/NSFwuuO1K8VTBO3NM8W01aOby0IjOcPKrc4kJ
+s9/8OBiUdnNu3eaBmPUKl6OMuaZ+nbsP96V+Um7oeTtZcz5xd843Phq95dxe33fJ
+X6YlrT2wpPuYcCZ30+Y9jnUDeankx5NpE9knww8d272vtfHo+P7EG2OtxqDObsNY
+xFR0bpZ9dGVQ+YOjo6a4zlEf21IynXN1enVL/qUwa09SZPyLDWc8M/b2h7eeXNmR
+9e6KrhjdqfRowtqcnby213fdcniy+uAbU5NY6GsXZyvT6TZ9vitzKKM7PHCh+V6C
+BkIyDqz/y2Oc/q3Pen4T9cpPz2ycjQ0ver4y/sQ1u/fiCe+VxogLnW0/26p0TJSM
+W3RVN5oS21smfthgqEq4UxR2JbluIn5L3+GnYyc+4PqGR2aWuxuGz39fubr177LW
+/qa40t20pdZUsyN466qoj5al1sUv66poOd7dcLoeGz8rP1s65Htudk9mkvfqwqjr
+9MEXfley6iNszTE5zZ4Pa/Pzmh7Wr7hQHpmSuTW7piXk06XeiDV3A19vyJpuSxlt
+YpzXmquxkIrgxbvMYfr64I2DS97L89zPqC91jbykX1Qtv3PEW5c+9UXj2YRLxqjY
+Q7v0n+mfyh2gi2t0q/58f/mj465fZvo7S179/B+zTtFG
+=+M7h
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/unfo
+
+==================================================================
