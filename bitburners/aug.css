@@ -1,0 +1,34 @@
+div.container {
+    float: left;
+    height: 80em;
+}
+div#factions {
+    /* border: 1px solid blue; */
+    width: 25em;
+}
+
+div#augments { 
+    /* border: 1px solid red; */
+    width: 80em;
+}
+
+div.container div {
+    float: left;
+    padding: 0.25em;
+    padding-left: 1em;
+    width: 20em;
+    height: 2em; 
+    text-align: left;
+    vertical-align: middle;
+}
+
+div#factions div {
+    background: lightblue;
+}
+
+div#augments div {
+    background: lightcoral;
+}
+.grey {
+    background: lightgray !important;
+}
