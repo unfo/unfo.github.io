@@ -1,54 +1,94 @@
-/* 
-Original source code from https://github.com/danielyxie/bitburner/tree/dev/src/Augmentation and Faction 
+/*
+Original source code from https://github.com/danielyxie/bitburner/tree/dev/src/Augmentation and Faction
 Adapted with mockups to form graph for visual representation by me
 */
 const nonWordRegexp = /\W+/g;
 
-class Faction {
+class DataItem {
+    /** @type {HTMLDivElement} */
+    elem;
+    /** @type {string} */
+    name;
+
+    /**
+     * @param {string} name
+     */
+    constructor(name) {
+        this.name = name;
+    }
+
+    createElement() {
+        this.elem = document.createElement('div');
+        this.elem.innerText = this.name;
+        this.elem.id = this.name;
+        this.elem.classList.add('data_item');
+        return this.elem;
+    }
+
+    addHighlight() {
+        this.elem.classList.add('highlight');
+    }
+
+    removeHighlight() {
+        this.elem.classList.remove('highlight');
+    }
+
+    addCssClass(cssClass) {
+        this.elem.classList.add(cssClass);
+    }
+
+    removeCssClass(cssClass) {
+        this.elem.classList.remove(cssClass);
+    }
+}
+
+class Faction extends DataItem {
+    /** @param {{name: string}} params */
     constructor(params) {
-        this.name = params.name;
+        super(params.name);
         this.augmentations = [];
     }
 }
+/** @type {Record<string, Faction>} */
 let Factions = {}
-let faclist = [
-"Speakers for the Dead",
-"Tetrads",
-"The Dark Army",
-"The Syndicate",
-"Slum Snakes",
-"Sector-12",
-"Ishima",
-"OmniTek Incorporated",
-"KuaiGong International",
-"Blade Industries",
-"The Covenant",
-"Fulcrum Secret Technologies",
-"NWO",
-"Daedalus",
-"Illuminati",
-"Volhaven",
-"Tian Di Hui",
-"Aevum",
-"ECorp",
-"MegaCorp",
-"Chongqing",
-"New Tokyo",
-"Silhouette",
-"Bachman & Associates",
-"Clarke Incorporated",
-"Four Sigma",
-"CyberSec",
-"NiteSec",
-"BitRunners",
-"The Black Hand",
-"Netburners",
-]
-for (let i = 0; i < faclist.length; i++) {
-    let faction = new Faction({name: faclist[i]});
-    Factions[faclist[i]] = faction;
-}
 
+let faclist = [
+    "Speakers for the Dead",
+    "Tetrads",
+    "The Dark Army",
+    "The Syndicate",
+    "Slum Snakes",
+    "Sector-12",
+    "Ishima",
+    "OmniTek Incorporated",
+    "KuaiGong International",
+    "Blade Industries",
+    "The Covenant",
+    "Fulcrum Secret Technologies",
+    "NWO",
+    "Daedalus",
+    "Illuminati",
+    "Volhaven",
+    "Tian Di Hui",
+    "Aevum",
+    "ECorp",
+    "MegaCorp",
+    "Chongqing",
+    "New Tokyo",
+    "Silhouette",
+    "Bachman & Associates",
+    "Clarke Incorporated",
+    "Four Sigma",
+    "CyberSec",
+    "NiteSec",
+    "BitRunners",
+    "The Black Hand",
+    "Netburners",
+];
+
+faclist.forEach(name => {
+    Factions[name] = new Faction({name});
+})
 
 const AugmentationNames = {
     Targeting1: "Augmented Targeting I",
@@ -162,14 +202,17 @@ const AugmentationNames = {
     BladesSimulacrum: "The Blade's Simulacrum",
 }
 
+/** @type {Record<string, Augmentation>} */
 let Augmentations = {}
+
+/** @param {Augmentation} aug */
 function AddToAugmentations(aug) {
     Augmentations[aug.name] = aug;
 }
 
-class Augmentation {
+class Augmentation extends DataItem {
     constructor(params) {
-        this.name = params.name;
+        super(params.name);
         this.info = params.info;
         this.prereqs = params.prereqs ? params.prereqs : [];
 
@@ -281,53 +324,27 @@ class Augmentation {
             this.stats = "undefined"; //generateStatsDescription(this.mults, params.programs, params.startingMoney);
         else this.stats = params.stats;
     }
-    fixname(name) {
-        return name.replaceAll(nonWordRegexp, '_');
-    }
-    // Adds this Augmentation to the specified Factions
+
+    /**
+     * Adds this Augmentation to the specified Factions
+     * @param {string[]} factionList
+     */
     addToFactions(factionList) {
-        let augname = this.fixname(this.name);
-        let faclist = factionList.map(fa => this.fixname(fa)).join(', ')
-        // console.log(`${augname} -> { ${faclist} }`);
-        this.factions = factionList;
-        for (let i = 0; i < factionList.length; ++i) {
+        this.factions = factionList.filter(Boolean);
 
-            let faction = Factions[factionList[i]];
+        this.factions.forEach(factionName => {
+            let faction = Factions[factionName];
             if (faction == null) {
-//                console.log("Faction ", factionList[i], " does not exist. Creating it")
-                let fac = new Faction({ name: factionList[i] });
-                // console.log("Adding new faction to global list");
-                Factions[factionList[i]] = fac;
-                faction = fac;
-
+                faction = Factions[factionName] = new Faction({ name: factionName });
+                console.log("Adding new faction to global list");
             }
-            console.log(`{"source: "${this.fixname(this.name)}", "target": "${this.fixname(faction.name)}", "value": 1},`);
             faction.augmentations.push(this.name);
-        }
+        })
     }
 
     // Adds this Augmentation to all Factions
     addToAllFactions() {
-        let factionlist = [];
-        for (const fac in Factions) {
-            if (Factions.hasOwnProperty(fac)) {
-                let facObj = Factions[fac];
-                if (facObj == null) {
-                    let fact = new Faction({ name: fac });
-                    Factions[fac] = fact;
-                    facObj = fact;
-                }
-                factionlist.append(fac);
-                if (facObj.getInfo().special) continue;
-                facObj.augmentations.push(this.name);
-                console.log(`{"source: "${this.fixname(this.name)}", "target": "${this.fixname(fac)}", "value": 1},`);
-            }
-        }
-        this.factions = factionlist;
-        let augname = this.fixname(this.name);
-        let faclist = factionlist.map(fa => this.fixname(fa)).join(', ')
-        // console.log(`${augname} -> { ${faclist} }`);
-
+        this.addToAllFactions(Object.keys(Factions));
     }
 }
 
@@ -2365,59 +2382,44 @@ AddToAugmentations(NeuroreceptorManager);
 const faction_container = document.querySelector('div#factions');
 function showRelevantElements(event) {
     const id = event.target.id;
-    // console.log('onmouserover ', id);
-    document.querySelectorAll('div.data_item').forEach(e => { 
-        // console.log(e.classList);
-        e.classList.add('grey');
-    });
-    document.querySelectorAll(`div.${id}`).forEach(e => { 
-        e.classList.remove('grey');        
-    });
-}
-function showAllElements(elem) {
-    document.querySelectorAll('div.data_item').forEach(e => { 
-        e.classList.remove('grey');        
-    });
-}
-let fac_names = [];
-for (const fact in Factions) {
-    fac_names.push(fact);
-}
-fac_names = fac_names.sort();
-for (let i = 0; i < fac_names.length; i++) {
-    let fact = fac_names[i];
-    let cleaned_name = fact.replaceAll(/\W+/g, '_');
-    let elem = document.createElement('div', {"id" : cleaned_name });
-    elem.innerText = fact;
-    for (let aug in Factions[fact].augmentations) {
-        let aug_name = Factions[fact].augmentations[aug].replaceAll(/\W+/g, '_');
-        elem.classList.add(aug_name);
+
+    if (Augmentations[id] && Augmentations[id].factions && Augmentations[id].factions.length) {
+        Augmentations[id].factions.forEach(fac => {
+            Factions[fac].addHighlight();
+        })
     }
-    elem.id = cleaned_name;
-    elem.classList.add('data_item');
-    elem.classList.add(cleaned_name);
+
+    if (Factions[id] && Factions[id].augmentations && Factions[id].augmentations.length) {
+        Factions[id].augmentations.forEach(aug => {
+            Augmentations[aug].addHighlight();
+        })
+    }
+}
+
+function showAllElements() {
+    for (const aug in Augmentations) {
+        Augmentations[aug] && Augmentations[aug].removeHighlight();
+    }
+
+    for (const fac in Factions) {
+        Factions[fac] && Factions[fac].removeHighlight();
+    }
+}
+
+for (const factionName in Factions) {
+    const faction = Factions[factionName];
+    const elem = faction.createElement();
     faction_container.appendChild(elem);
 }
+
 const augment_container = document.querySelector('div#augments');
-let aug_names = [];
 
-for (const aug in Augmentations) {
-    aug_names.push(aug);
-}
-aug_names = aug_names.sort();
-for (let i = 0; i < aug_names.length; i++) {
-    let aug = aug_names[i];
-
-    let cleaned_name = aug.replaceAll(/\W+/g, '_');
-    let elem = document.createElement('div', {"id" : cleaned_name });
-    for (let faction in Augmentations[aug].factions) {
-        let fact_name = Augmentations[aug].factions[faction].replaceAll(/\W+/g, '_');
-        elem.classList.add(fact_name);        
+for (const augName in Augmentations) {
+    const augmentation = Augmentations[augName];
+    const elem = augmentation.createElement();
+    if (augmentation.isSpecial || (augmentation.factions && augmentation.factions.length === 1)) {
+        augmentation.addCssClass('unique-augmentation');
     }
-    elem.id = cleaned_name;
-    elem.classList.add('data_item');
-    elem.classList.add(cleaned_name);
-    elem.innerText = aug;
     augment_container.appendChild(elem);
 }
 
