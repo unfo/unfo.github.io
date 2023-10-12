@@ -84,7 +84,7 @@ let faclist = [
     "BitRunners",
     "The Black Hand",
     "Netburners",
-];
+].sort();
 
 faclist.forEach(name => {
     Factions[name] = new Faction({name});
@@ -320,7 +320,7 @@ class Augmentation extends DataItem {
             this.mults.bladeburner_success_chance_mult = params.bladeburner_success_chance_mult;
         }
 
-        if (params.stats === undefined)
+        if (params.stats == undefined)
             this.stats = "undefined"; //generateStatsDescription(this.mults, params.programs, params.startingMoney);
         else this.stats = params.stats;
     }
@@ -344,7 +344,7 @@ class Augmentation extends DataItem {
 
     // Adds this Augmentation to all Factions
     addToAllFactions() {
-        this.addToAllFactions(Object.keys(Factions));
+        this.addToFactions(Object.keys(Factions));
     }
 }
 
@@ -2383,16 +2383,19 @@ const faction_container = document.querySelector('div#factions');
 function showRelevantElements(event) {
     const id = event.target.id;
 
-    if (Augmentations[id] && Augmentations[id].factions && Augmentations[id].factions.length) {
+    const isFaction = event.target.className.split(' ').includes('faction');
+    const isAugment = event.target.className.split(' ').includes('augment');
+
+    if (isAugment && Augmentations[id] && Augmentations[id].factions && Augmentations[id].factions.length) {
         Augmentations[id].factions.forEach(fac => {
             Factions[fac].addHighlight();
-        })
+        });
     }
 
-    if (Factions[id] && Factions[id].augmentations && Factions[id].augmentations.length) {
+    if (isFaction && Factions[id] && Factions[id].augmentations && Factions[id].augmentations.length) {
         Factions[id].augmentations.forEach(aug => {
             Augmentations[aug].addHighlight();
-        })
+        });
     }
 }
 
@@ -2409,19 +2412,21 @@ function showAllElements() {
 for (const factionName in Factions) {
     const faction = Factions[factionName];
     const elem = faction.createElement();
+    faction.addCssClass('faction');
     faction_container.appendChild(elem);
 }
 
 const augment_container = document.querySelector('div#augments');
 
-for (const augName in Augmentations) {
+Object.keys(Augmentations).sort().forEach(augName => {
     const augmentation = Augmentations[augName];
     const elem = augmentation.createElement();
-    if (augmentation.isSpecial || (augmentation.factions && augmentation.factions.length === 1)) {
+    augmentation.addCssClass('augment');
+    if (augmentation.factions && augmentation.factions.length === 1) {
         augmentation.addCssClass('unique-augmentation');
     }
     augment_container.appendChild(elem);
-}
+});
 
 document.querySelectorAll('div.data_item').forEach(item => { item.addEventListener('mouseover', showRelevantElements)});
 document.querySelectorAll('div.data_item').forEach(item => { item.addEventListener('mouseout', showAllElements)});
