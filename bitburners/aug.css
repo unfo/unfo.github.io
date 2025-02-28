@@ -29,6 +29,11 @@ div#augments {
     width: 20rem;
 }
 
+.data_item:hover {
+    font-weight: bold;
+    background-color: #bdbdbd;
+}
+
 div#augments .data_item.highlight  {
     background: lightblue;
 }
