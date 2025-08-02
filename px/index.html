@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Image Coordinate Picker with Naming</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { font-family: system-ui,-apple-system,BlinkMacSystemFont,sans-serif; margin: 16px; background: #f7f7f7; color: #111; }
+    h1 { margin-bottom: 4px; }
+    #controls { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    #imageContainer { position: relative; display: inline-block; border: 1px solid #ccc; background: white; max-width: 100%; }
+    #mapImage { display: block; max-width: 100%; height: auto; cursor: crosshair; user-select: none; }
+    .marker { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: rgba(255, 60, 60, 0.9); border: 2px solid white; transform: translate(-50%, -50%); pointer-events: none; }
+    #log { margin-top: 12px; background: white; border: 1px solid #ddd; padding: 12px; border-radius: 6px; max-width: 800px; }
+    #coordsList { list-style: none; padding: 0; margin: 0 0 8px; max-height: 300px; overflow:auto; }
+    .coord-entry { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; font-size: 14px; }
+    .coord-text { flex: 1; font-family: monospace; }
+    button { padding: 6px 12px; border: none; cursor: pointer; border-radius: 5px; background: #2563eb; color: white; font-size: 14px; }
+    button.secondary { background: #6b7280; }
+    button.small { font-size: 12px; padding: 4px 8px; }
+    #exportArea { margin-top: 6px; font-size: 13px; }
+    .flex { display: flex; gap: 8px; flex-wrap: wrap; }
+    .info { margin-top: 4px; font-size: 13px; }
+    a { color: #2563eb; text-decoration: none; }
+    .hidden { display: none; }
+    label.switch { position: relative; display: inline-block; width: 52px; height: 28px; }
+    label.switch input { opacity: 0; width: 0; height: 0; }
+    .slider { position: absolute; cursor: pointer; top:0; left:0; right:0; bottom:0; background-color:#ccc; transition:.4s; border-radius: 28px; }
+    .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .slider { background-color: #2563eb; }
+    input:checked + .slider:before { transform: translateX(24px); }
+  </style>
+</head>
+<body>
+  <h1>Image Coordinate Picker</h1>
+  <div class="info">Upload an image, then click on it. Coordinates will be shown in image pixel space (<code>(x, y)</code>). You can copy individual entries or all at once. This works entirely locally; nothing is sent anywhere.</div>
+  <div id="controls">
+    <div>
+      <label for="fileInput"><strong>Choose image:</strong></label>
+      <input type="file" id="fileInput" accept="image/*">
+    </div>
+    <div style="display:flex; align-items:center; gap:6px;">
+      <label class="switch" title="When on, you'll be prompted to name each clicked point.">
+        <input type="checkbox" id="promptNames">
+        <span class="slider"></span>
+      </label>
+      <label for="promptNames">Prompt for names</label>
+    </div>
+    <div class="flex">
+      <button id="copyAll">Copy All</button>
+      <button id="downloadLog">Download Log</button>
+      <button id="clear">Clear</button>
+    </div>
+  </div>
+  <div style="margin-top: 16px; display:flex; gap: 20px; flex-wrap: wrap;">
+    <div id="imageWrapper">
+      <div id="imageContainer">
+        <img id="mapImage" alt="Upload an image to begin">
+      </div>
+      <div class="info" id="lastCoord">No clicks yet.</div>
+    </div>
+    <div id="log">
+      <h3>Clicked Coordinates</h3>
+      <ul id="coordsList"></ul>
+      <div id="exportArea">
+        <div><strong>Bulk copy:</strong></div>
+        <textarea id="bulk" rows="6" style="width:100%; font-family: monospace;" readonly></textarea>
+      </div>
+    </div>
+  </div>
+  <script>
+    const fileInput = document.getElementById("fileInput");
+    const mapImage = document.getElementById("mapImage");
+    const coordsList = document.getElementById("coordsList");
+    const lastCoord = document.getElementById("lastCoord");
+    const copyAllBtn = document.getElementById("copyAll");
+    const clearBtn = document.getElementById("clear");
+    const downloadLogBtn = document.getElementById("downloadLog");
+    const bulk = document.getElementById("bulk");
+    const imageContainer = document.getElementById("imageContainer");
+    const promptNames = document.getElementById("promptNames");
+
+    let entries = [];
+
+    function formatEntry(e) {
+      if (e.name) {
+        // escape quotes inside name
+        const safe = e.name.replace(/"/g, '\\"');
+        return `"${safe}": (${e.x}, ${e.y}),`;
+      } else {
+        return `(${e.x}, ${e.y})`;
+      }
+    }
+
+    function updateBulk() {
+      // If any entry has a name, output each entry on its own line with python-dict-style for named ones.
+      const lines = entries.map(formatEntry);
+      bulk.value = lines.join("\n");
+    }
+
+    function addEntry(x, y, name=null) {
+      const entry = { x, y };
+      if (name) entry.name = name;
+      entries.push(entry);
+      const li = document.createElement("li");
+      li.className = "coord-entry";
+      const span = document.createElement("div");
+      span.className = "coord-text";
+      span.textContent = formatEntry(entry);
+      const copyBtn = document.createElement("button");
+      copyBtn.textContent = "Copy";
+      copyBtn.className = "small";
+      copyBtn.addEventListener("click", () => {
+        navigator.clipboard.writeText(formatEntry(entry)).then(() => {
+          copyBtn.textContent = "Copied!";
+          setTimeout(() => (copyBtn.textContent = "Copy"), 800);
+        });
+      });
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "×";
+      removeBtn.title = "Remove";
+      removeBtn.className = "small secondary";
+      removeBtn.style.width = "32px";
+      removeBtn.addEventListener("click", () => {
+        entries = entries.filter(e => !(e.x === x && e.y === y && e.name === entry.name));
+        li.remove();
+        updateBulk();
+      });
+      li.append(span, copyBtn, removeBtn);
+      coordsList.appendChild(li);
+      lastCoord.textContent = name
+        ? `Last clicked: ${name} (${x}, ${y})`
+        : `Last clicked: (${x}, ${y})`;
+      updateBulk();
+    }
+
+    fileInput.addEventListener("change", (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      mapImage.src = url;
+      // reset entries/markers
+      entries = [];
+      coordsList.innerHTML = "";
+      updateBulk();
+      lastCoord.textContent = "No clicks yet.";
+      document.querySelectorAll(".marker").forEach(el => el.remove());
+    });
+
+    mapImage.addEventListener("click", (e) => {
+      const rect = mapImage.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      const offsetX = e.clientX - rect.left;
+      const offsetY = e.clientY - rect.top;
+      const scaleX = mapImage.naturalWidth / rect.width;
+      const scaleY = mapImage.naturalHeight / rect.height;
+      const x = Math.round(offsetX * scaleX);
+      const y = Math.round(offsetY * scaleY);
+
+      let name = null;
+      if (promptNames.checked) {
+        name = prompt("Name for this point:");
+        if (name === null) {
+          return; // user cancelled, do nothing
+        }
+        name = name.trim();
+        if (name === "") name = null;
+      }
+
+      // Add marker at displayed position
+      const marker = document.createElement("div");
+      marker.className = "marker";
+      marker.style.left = `${offsetX}px`;
+      marker.style.top = `${offsetY}px`;
+      imageContainer.appendChild(marker);
+
+      addEntry(x, y, name);
+    });
+
+    copyAllBtn.addEventListener("click", () => {
+      const text = bulk.value;
+      navigator.clipboard.writeText(text).then(() => {
+        copyAllBtn.textContent = "Copied all!";
+        setTimeout(() => (copyAllBtn.textContent = "Copy All"), 1000);
+      });
+    });
+
+    clearBtn.addEventListener("click", () => {
+      entries = [];
+      coordsList.innerHTML = "";
+      updateBulk();
+      lastCoord.textContent = "No clicks yet.";
+      document.querySelectorAll(".marker").forEach(el => el.remove());
+    });
+
+    downloadLogBtn.addEventListener("click", () => {
+      const text = bulk.value;
+      const blob = new Blob([text], { type: "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "coordinates.txt";
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    // keyboard shortcut: Ctrl/Cmd+A to copy all
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "a" && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        copyAllBtn.click();
+      }
+    });
+  </script>
+</body>
+</html>
