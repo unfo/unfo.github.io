@@ -13,26 +13,62 @@ body, html {
 .container {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  width: 90%;
+  justify-content: flex-start;
+  width: 98%;
   max-width: 500px;
-  height: 90vh;
+  height: 100vh;
   text-align: center;
 }
 
 .time-selection {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 20px;
+  flex: 0 0 auto;
+}
+
+.hour-selection p, .minute-selection p {
+  font-size: 1.3em;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+  background-color: #f8f9fa;
+  padding: 8px 16px;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Localized text using :lang() pseudo-class */
+:lang(en) .section-title[data-text-key="hour"]::after { content: "Hour:"; }
+:lang(en) .section-title[data-text-key="minute"]::after { content: "Minute:"; }
+
+:lang(fi) .section-title[data-text-key="hour"]::after { content: "Tunti:"; }
+:lang(fi) .section-title[data-text-key="minute"]::after { content: "Minuutti:"; }
+
+:lang(sv) .section-title[data-text-key="hour"]::after { content: "Timme:"; }
+:lang(sv) .section-title[data-text-key="minute"]::after { content: "Minut:"; }
+
+.section-title {
+  font-size: 0; /* Hide original text */
+}
+.section-title::after {
+  font-size: 1.3rem; /* Show localized text */
+}
+
+.hour-selection {
+  padding: 15px 0 10px 0;
+}
+
+.minute-selection {
+  padding: 10px 0 15px 0;
 }
 
 .options {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 5px;
+  gap: 6px;
+  padding: 0 5px;
 }
 
 .options input[type="radio"] {
@@ -41,10 +77,14 @@ body, html {
 
 .options label {
   cursor: pointer;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 12px 16px;
+  border-radius: 6px;
   background-color: #ddd;
   user-select: none;
+  font-size: 1.1em;
+  font-weight: 500;
+  min-width: 40px;
+  text-align: center;
 }
 
 .options input[type="radio"]:checked + label {
@@ -53,13 +93,15 @@ body, html {
 }
 
 .time-output {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2em;
+  font-size: 3.5em;
+  font-weight: bold;
   background-color: #fff;
   border-radius: 10px;
-  padding: 20px;
+  padding: 8px 15px;
+  margin: 10px 5px 15px 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
