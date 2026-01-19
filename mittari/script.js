@@ -1,4 +1,19 @@
 document.addEventListener('DOMContentLoaded', () => {
+  // Auto-detect and set language with fallback to supported languages
+  try {
+    const browserLang = navigator.language ? navigator.language.substring(0, 2).toLowerCase() : 'en';
+    const supportedLanguages = ['fi', 'sv'];
+    
+    if (supportedLanguages.includes(browserLang)) {
+      document.documentElement.lang = browserLang;
+    } else {
+      document.documentElement.lang = 'fi'; // Default to Finnish
+    }
+  } catch (error) {
+    console.warn('Language detection failed, defaulting to English:', error);
+    document.documentElement.lang = 'en';
+  }
+
   const hourOptions = document.getElementById('hour-options');
   const minuteOptions = document.getElementById('minute-options');
 
